@@ -943,8 +943,10 @@ html, body {
     border-radius: 2px;
     cursor: pointer;
     position: relative;
-    padding: 8px 0;
-    margin: -8px 0;
+}
+
+.grid-media:hover .video-controls {
+    opacity: 1;
 }
 
 .video-progress-bar {
@@ -1310,7 +1312,7 @@ html, body {
                 </div>
                 <div class="grid-cell-media">
                     <div class="grid-media">
-                        <video id="video1" src="1.VR-Sound-Canyon/demo.mp4" playsinline preload="metadata"></video>
+                        <video id="video1" playsinline preload="metadata"></video>
                         <div class="video-overlay" onclick="toggleVideo('video1', this)">
                             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         </div>
@@ -1425,7 +1427,7 @@ html, body {
             <div class="project-box-alt4">
                 <div class="grid-cell grid-cell-video">
                     <div class="grid-media">
-                        <video id="video2" src="4.VR-Conversation/demo.mp4" playsinline preload="metadata" controls></video>
+                        <video id="video2" playsinline preload="metadata"></video>
                     </div>
                     <div class="grid-media">
                         <img src="4.VR-Conversation/1.png" alt="VR社交体验用户研究" onclick="openImageModal(this.src)">
@@ -1454,6 +1456,23 @@ html, body {
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script>
+// 使用 HLS 加载视频，支持任意进度拖拽
+(function() {
+    var sources = {
+        'video1': '1.VR-Sound-Canyon/hls/index.m3u8',
+        'video2': '4.VR-Conversation/hls/index.m3u8'
+    };
+    for (var id in sources) {
+        var video = document.getElementById(id);
+        if (!video) continue;
+        var hls = new Hls();
+        hls.loadSource(sources[id]);
+        hls.attachMedia(video);
+    }
+})();
+</script>
 <script>
 (function () {
     var sections = document.querySelectorAll('.page-section');
@@ -1615,79 +1634,9 @@ function seekVideo(event, videoId) {
     var progress = event.currentTarget;
     if (!video || !video.duration) return;
     var rect = progress.getBoundingClientRect();
-    var clientX = event.touches ? event.touches[0].clientX : event.clientX;
-    var percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    var percent = (event.clientX - rect.left) / rect.width;
     video.currentTime = percent * video.duration;
 }
-
-// 拖拽进度条支持
-(function() {
-    var isDragging = false;
-    var dragVideoId = null;
-
-    document.addEventListener('mousedown', function(e) {
-        var bar = e.target.closest('.video-progress');
-        if (bar) {
-            isDragging = true;
-            dragVideoId = bar.getAttribute('data-video-id');
-            seekFromEvent(e);
-            e.preventDefault();
-        }
-    });
-
-    document.addEventListener('mousemove', function(e) {
-        if (isDragging && dragVideoId) {
-            seekFromEvent(e);
-        }
-    });
-
-    document.addEventListener('mouseup', function() {
-        isDragging = false;
-        dragVideoId = null;
-    });
-
-    // 触摸支持
-    document.addEventListener('touchstart', function(e) {
-        var bar = e.target.closest('.video-progress');
-        if (bar) {
-            isDragging = true;
-            dragVideoId = bar.getAttribute('data-video-id');
-            seekFromEvent(e);
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    document.addEventListener('touchmove', function(e) {
-        if (isDragging && dragVideoId) {
-            seekFromEvent(e);
-        }
-    }, { passive: false });
-
-    document.addEventListener('touchend', function() {
-        isDragging = false;
-        dragVideoId = null;
-    });
-
-    function seekFromEvent(e) {
-        if (!dragVideoId) return;
-        var video = document.getElementById(dragVideoId);
-        if (!video || !video.duration) return;
-        var bar = document.querySelector('.video-progress[data-video-id="' + dragVideoId + '"]');
-        if (!bar) return;
-        var rect = bar.getBoundingClientRect();
-        var clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        var percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-        video.currentTime = percent * video.duration;
-    }
-
-    // 给进度条添加 data-video-id 属性
-    document.querySelectorAll('.video-progress').forEach(function(bar) {
-        var videoEl = bar.closest('.grid-media').querySelector('video');
-        if (videoEl) {
-            bar.setAttribute('data-video-id', videoEl.id);
-        }
-    });
-})();
 
 function toggleFullscreen(videoId) {
     var video = document.getElementById(videoId);
