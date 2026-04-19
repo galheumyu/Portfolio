@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>个人作品集</title>
+<style>
+/* ==================== 基础样式重置 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ==================== 图片预览弹窗 ==================== */
+.image-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.image-modal.active {
+    display: flex;
+}
+
+.image-modal img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.image-modal .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.3s;
+}
+
+.image-modal .close-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.image-modal .close-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+/* ==================== 页面基础样式 ==================== */
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #fafdf6;
+}
+
+/* ==================== 页面容器和滚动 ==================== */
+.page-container {
+    width: 100%;
+    transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+    will-change: transform;
+}
+
+/* 每个页面区块 */
+.page-section {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+/* 页面装饰背景 - 右上角黄色光晕 */
+.page-section::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 213, 79, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 页面装饰背景 - 左下角绿色光晕 */
+.page-section::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -100px;
+    width: 450px;
+    height: 450px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(129, 199, 132, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ==================== 首页英雄区域样式 ==================== */
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+}
+
+.hero-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    max-width: 680px;
+    padding: 0 24px;
+}
+
+/* 头像样式 */
+.hero-avatar {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a5d6a7 0%, #ffd54f 50%, #81c784 100%);
+    position: relative;
+    box-shadow: 0 8px 32px rgba(129, 199, 132, 0.3);
+}
+
+.hero-avatar::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fafdf6, #f0f5ec);
+}
+
+.hero-avatar::after {
+    content: '葛';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    font-weight: 800;
+    color: #4a7c3f;
+}
+
+/* 姓名样式 */
+.hero-name {
+    font-size: 65px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a5d6a7 0%, #ffd54f 50%, #81c784 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    letter-spacing: 4px;
+}
+
+/* 学校信息 */
+.hero-school {
+    font-size: 22px;
+    font-weight: 400;
+    color: #5a7a3f;
+    letter-spacing: 2px;
+    margin-bottom: 28px;
+}
+
+/* 分隔线 */
+.hero-line {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #a5d6a7, #ffd54f);
+    border-radius: 2px;
+    margin: 0 auto 32px;
+}
+
+/* 联系方式区域 */
+.hero-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.contact-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    position: relative;
+}
+
+/* 邮箱图标 */
+.contact-icon-email {
+    background: linear-gradient(135deg, #a5d6a7, #81c784);
+}
+
+.contact-icon-email::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 8px;
+    border: 2px solid #fff;
+    border-radius: 2px;
+}
+
+.contact-icon-email::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 5px solid #fff;
+}
+
+/* 电话图标 */
+.contact-icon-phone {
+    background: linear-gradient(135deg, #ffd54f, #ffca28);
+}
+
+.contact-icon-phone::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 12px;
+    border: 2px solid #fff;
+    border-radius: 3px;
+}
+
+.contact-icon-phone::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 2px;
+    background: #fff;
+    border-radius: 1px;
+}
+
+.contact-text {
+    font-size: 20px;
+    color: #5a6e52;
+    letter-spacing: 0.5px;
+}
+
+/* 滚动提示 */
+.hero-scroll-hint {
+    position: absolute;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(90, 110, 82, 0.4);
+    font-size: 12px;
+    letter-spacing: 2px;
+    animation: scrollBounce 2s ease-in-out infinite;
+    z-index: 2;
+}
+
+@keyframes scrollBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(10px); }
+}
+
+.scroll-arrow {
+    width: 18px;
+    height: 18px;
+    border-right: 2px solid rgba(90, 110, 82, 0.3);
+    border-bottom: 2px solid rgba(90, 110, 82, 0.3);
+    transform: rotate(45deg);
+}
+
+/* ==================== 项目展示区域样式 ==================== */
+.project-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+}
+
+/* 项目容器 - 2x2网格布局 */
+.project-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: min(150vw, 150vh);
+    height: min(150vw, 150vh);
+    max-width: 1400px;
+    max-height: 900px;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 24px;
+}
+
+/* 项目一布局：左侧文字 + 右侧垂直媒体 */
+.project-box-alt1 {
+    display: flex;
+    gap: 8px;
+    width: 90%;
+    max-width: 1400px;
+    height: 85vh;
+    padding: 8px;
+    border-radius: 24px;
+
+}
+
+.project-box-alt1 .grid-cell-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.project-box-alt1 .grid-cell-text .grid-text {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.project-box-alt1 .grid-cell-media {
+    flex: 0 0 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.project-box-alt1 .grid-cell-media .grid-media {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.project-box-alt1 .grid-cell-media .grid-media video,
+.project-box-alt1 .grid-cell-media .grid-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.project-box-alt1 .grid-text-full {
+    padding: 16px;
+    gap: 4px;
+}
+
+.project-box-alt1 .grid-text-full .grid-title {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+
+.project-box-alt1 .grid-text-full .grid-subtitle {
+    font-size: 16px;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.project-box-alt1 .grid-text-full .grid-desc {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+.project-box-alt1 .grid-text-full .grid-desc-small {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+/* 替代布局方案 - 项目二：左侧文字 + 右侧上下布局 */
+.project-box-alt {
+    display: flex;
+    gap: 8px;
+    width: 90%;
+    max-width: 1400px;
+    height: 85vh;
+    padding: 8px;
+}
+
+.project-box-alt .grid-cell-full {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.project-box-alt .grid-cell:not(.grid-cell-full) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    margin-top: -100px;
+}
+
+.project-box-alt .grid-cell:not(.grid-cell-full) .grid-media {
+    width: 700px;
+    height: 310px;
+    object-fit: cover;
+}
+
+.project-box-alt .grid-cell:not(.grid-cell-full) .grid-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.project-box-alt .grid-cell:not(.grid-cell-full) .grid-text {
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.project-box-alt .grid-text-full {
+    padding: 16px;
+    gap: 4px;
+}
+
+.project-box-alt .grid-text-full .grid-title {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+
+.project-box-alt .grid-text-full .grid-subtitle {
+    font-size: 16px;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.project-box-alt .grid-text-full .grid-desc {
+    font-size: 17px;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+.project-box-alt .grid-text-full .grid-desc-small {
+    font-size: 17px;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+/* 项目三布局：上方文字 + 下方三图 */
+.project-box-alt3 {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 90%;
+    max-width: 1400px;
+    height: 85vh;
+    padding: 8px;
+}
+
+.project-box-alt3 .grid-cell-text3 {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.project-box-alt3 .grid-cell-text3 .grid-text {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.project-box-alt3 .images-row {
+    display: flex;
+    gap: 8px;
+
+    min-height: 0;
+}
+
+.project-box-alt3 .images-row .grid-cell {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.project-box-alt3 .bottom-row {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
+}
+
+.project-box-alt3 .grid-cell-results {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+}
+
+.project-box-alt3 .grid-cell-results .grid-text {
+    padding: 8px;
+    overflow-y: auto;
+}
+
+.project-box-alt3 .grid-cell-results .grid-subtitle {
+    font-size: 17px;
+    margin-bottom: 8px;
+}
+
+.project-box-alt3 .grid-cell-results .grid-desc-small {
+    font-size: 17px;
+    line-height: 1.5;
+}
+
+/* 项目三图片完整显示 */
+.project-box-alt3 .grid-media img {
+    object-fit: contain;
+
+}
+
+.project-box-alt3 .grid-text-full {
+    padding: 16px;
+    gap: 4px;
+}
+
+.project-box-alt3 .grid-text-full .grid-title {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+
+.project-box-alt3 .grid-text-full .grid-subtitle {
+    font-size: 16px;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.project-box-alt3 .grid-text-full .grid-desc {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+.project-box-alt3 .grid-text-full .grid-desc-small {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+/* 项目四布局：左侧上下媒体 + 右侧文字 */
+.project-box-alt4 {
+    display: flex;
+    gap: 8px;
+    width: 90%;
+    max-width: 1400px;
+    height: 85vh;
+    padding: 8px;
+}
+
+.project-box-alt4 .grid-cell-video {
+    flex: 0 0 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.project-box-alt4 .grid-cell-video .grid-media {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.project-box-alt4 .grid-cell-video .grid-media video,
+.project-box-alt4 .grid-cell-video .grid-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.project-box-alt4 .grid-cell-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.project-box-alt4 .grid-cell-text .grid-text {
+    height: 100%;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.project-box-alt4 .grid-text-full .grid-title {
+    font-size: 21px;
+    margin-bottom: 6px;
+}
+
+.project-box-alt4 .grid-text-full .grid-subtitle {
+    font-size: 16px;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+.project-box-alt4 .grid-text-full .grid-desc {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+.project-box-alt4 .grid-text-full .grid-desc-small {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+/* ==================== 网格单元格样式 ==================== */
+.grid-cell {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 16px;
+
+}
+
+.grid-cell-full {
+    grid-row: 1 / 3;
+    grid-column: 1;
+}
+
+.grid-text-full {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px;
+    gap: 8px;
+}
+
+.grid-text-full .grid-desc-small {
+    font-size: 20px;
+    line-height: 1.8;
+    margin-top: 14px;
+    letter-spacing: 0.2px;
+}
+
+.grid-text-full .grid-desc {
+    font-size: 17px;
+    line-height: 1.6;
+    margin-top: 12px;
+    letter-spacing: 0.2px;
+}
+
+.grid-text-full .grid-subtitle {
+    margin-top: 10px;
+}
+
+/* ==================== 媒体容器样式 ==================== */
+.grid-media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    
+    width: 100%;
+    height: 100%;
+}
+
+.grid-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s ease;
+}
+
+.grid-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #000;
+}
+
+.grid-media:hover img {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+/* ==================== 文字内容样式 ==================== */
+.grid-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    max-width: 100%;
+    overflow: hidden;
+    gap: 4px;
+}
+
+.grid-text-center {
+    justify-content: center;
+}
+
+/* 项目一特定样式 */
+.project1-text.grid-text-full .grid-desc-small {
+    font-size: 17px;
+    line-height: 1.6;
+}
+
+.project1-text.grid-text-full .grid-desc {
+    font-size: 17px;
+    line-height: 1.6;
+}
+
+/* 项目二特定样式 */
+.project2-text .grid-desc-small {
+    font-size: 21px;
+    line-height: 1.9;
+    margin-top: 14px;
+}
+
+.project2-text .grid-subtitle {
+    font-size: 17px;
+    margin-bottom: 6px;
+}
+
+.project2-text .results-list li {
+    font-size: 17px;
+    padding: 8px 0;
+    padding-left: 24px;
+}
+
+.project2-text .results-list li::before {
+    font-size: 20px;
+}
+
+/* 标签样式 */
+.grid-tag {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+    width: fit-content;
+}
+
+.tag-photo {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    color: #4a7c3f;
+}
+
+.tag-video {
+    background: linear-gradient(135deg, #fff8e1, #ffecb3);
+    color: #a68400;
+}
+
+.tag-mixed {
+    background: linear-gradient(135deg, #e8f5e9, #fff8e1);
+    color: #5a7a3f;
+}
+
+/* 标题样式 */
+.grid-title {
+    font-size: 26px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a5d6a7 0%, #ffd54f 50%, #81c784 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.3;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.grid-title::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, #a5d6a7, #ffd54f);
+    border-radius: 2px;
+    margin-top: 8px;
+}
+
+.grid-subtitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3d6b30;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* 描述文字 */
+.grid-desc {
+    font-size: 18px;
+    line-height: 1.4;
+    color: #5a6e52;
+    letter-spacing: 0.2px;
+    margin-top: 8px;
+}
+
+.grid-desc-small {
+    font-size: 18px;
+    line-height: 1.4;
+    color: #6a7e62;
+    white-space: pre-line;
+    letter-spacing: 0.2px;
+}
+
+/* 成果列表 */
+.results-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+}
+
+.results-list li {
+    font-size: 15px;
+
+    color: #5a6e52;
+    padding: 2px 0;
+    padding-left: 20px;
+    position: relative;
+}
+
+.results-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #81c784;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* ==================== 视频控件样式 ==================== */
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+}
+
+.video-overlay svg {
+    width: 60px;
+    height: 60px;
+    fill: rgba(255, 255, 255, 0.9);
+}
+
+.video-overlay:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* 视频控制栏 */
+.video-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.6));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+.grid-media:hover .video-controls {
+    opacity: 1;
+}
+
+.video-controls-btn,
+.video-fullscreen-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-controls-btn svg,
+.video-fullscreen-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: #fff;
+}
+
+.video-progress {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.video-progress-bar {
+    height: 100%;
+    background: #a5d6a7;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+.video-time {
+    font-size: 12px;
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* ==================== 装饰元素样式 ==================== */
+.leaf-deco {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.05;
+    z-index: 1;
+}
+
+.leaf-1 {
+    top: 10%;
+    left: 8%;
+    width: 100px;
+    height: 100px;
+    border-radius: 0 50% 50% 50%;
+    background: #81c784;
+    transform: rotate(-30deg);
+}
+
+.leaf-2 {
+    bottom: 15%;
+    right: 10%;
+    width: 80px;
+    height: 80px;
+    border-radius: 50% 50% 0 50%;
+    background: #ffd54f;
+    transform: rotate(45deg);
+}
+
+.leaf-3 {
+    top: 55%;
+    left: 15%;
+    width: 50px;
+    height: 50px;
+    border-radius: 50% 0 50% 50%;
+    background: #a5d6a7;
+    transform: rotate(15deg);
+}
+
+/* ==================== 动画效果 ==================== */
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeSlideLeft {
+    from {
+        opacity: 0;
+        transform: translateX(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeSlideRight {
+    from {
+        opacity: 0;
+        transform: translateX(-25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 首页动画 */
+.page-section.visible .hero-content { animation: fadeSlideIn 0.8s ease forwards; }
+.page-section.visible .hero-avatar { animation: fadeSlideIn 0.8s ease 0.1s forwards; opacity: 0; animation-fill-mode: forwards; }
+.page-section.visible .hero-name { animation: fadeSlideIn 0.8s ease 0.2s forwards; opacity: 0; animation-fill-mode: forwards; }
+.page-section.visible .hero-school { animation: fadeSlideIn 0.8s ease 0.3s forwards; opacity: 0; animation-fill-mode: forwards; }
+.page-section.visible .hero-line { animation: fadeSlideIn 0.8s ease 0.35s forwards; opacity: 0; animation-fill-mode: forwards; }
+.page-section.visible .hero-contact { animation: fadeSlideIn 0.8s ease 0.4s forwards; opacity: 0; animation-fill-mode: forwards; }
+
+/* 项目页动画 */
+.page-section.visible .project-box { animation: fadeSlideIn 0.8s ease forwards; }
+.page-section.visible .project-box .grid-cell:nth-child(1) { animation: fadeSlideIn 0.6s ease 0.1s forwards; opacity: 0; animation-fill-mode: forwards; }
+.page-section.visible .project-box .grid-cell:nth-child(2) { animation: fadeSlideIn 0.6s ease 0.2s forwards; opacity: 0; animation-fill-mode: forwards; }
+.page-section.visible .project-box .grid-cell:nth-child(3) { animation: fadeSlideIn 0.6s ease 0.3s forwards; opacity: 0; animation-fill-mode: forwards; }
+.page-section.visible .project-box .grid-cell:nth-child(4) { animation: fadeSlideIn 0.6s ease 0.4s forwards; opacity: 0; animation-fill-mode: forwards; }
+
+/* ==================== 导航和页码 ==================== */
+.dot-nav {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 100;
+}
+
+.dot-nav-item {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(180, 190, 170, 0.35);
+    cursor: pointer;
+    transition: all 0.4s ease;
+    border: none;
+    outline: none;
+    padding: 0;
+}
+
+.dot-nav-item:hover {
+    background: rgba(180, 190, 170, 0.6);
+    transform: scale(1.3);
+}
+
+.dot-nav-item.active {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 2px rgba(130, 180, 110, 0.5);
+    transform: scale(1.2);
+}
+
+/* 页码显示 */
+.page-number {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    color: rgba(90, 110, 82, 0.45);
+    letter-spacing: 2px;
+    z-index: 100;
+    font-weight: 300;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 900px) {
+    .page-section {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .project-wrapper {
+        padding: 20px;
+    }
+
+    .project-box {
+        width: 100%;
+        height: auto;
+        min-width: 280px;
+        max-width: 500px;
+        aspect-ratio: 1;
+    }
+
+    .grid-cell {
+        min-height: auto;
+    }
+
+    .grid-media {
+        width: 100%;
+        height: 100%;
+    }
+
+    .grid-title {
+        font-size: 26px;
+    }
+
+    .grid-subtitle {
+        font-size: 16px;
+    }
+
+    .grid-desc {
+        font-size: 15px;
+    }
+
+    .grid-desc-small {
+        font-size: 14px;
+    }
+
+    .grid-tag {
+        font-size: 14px;
+    }
+
+    .hero-name {
+        font-size: 36px;
+    }
+
+    .hero-school {
+        font-size: 20px;
+    }
+
+    .hero-avatar {
+        width: 90px;
+        height: 90px;
+    }
+
+    .hero-avatar::after {
+        font-size: 36px;
+    }
+
+    .contact-text {
+        font-size: 20px;
+    }
+
+    .dot-nav {
+        right: 8px;
+        gap: 6px;
+    }
+
+    .dot-nav-item {
+        width: 5px;
+        height: 5px;
+    }
+}
+
+/* 小屏幕适配 (480px以下) */
+@media (max-width: 480px) {
+    .project-box {
+        gap: 6px;
+        padding: 6px;
+        min-width: 240px;
+    }
+
+    .grid-title {
+        font-size: 24px;
+    }
+
+    .grid-subtitle {
+        font-size: 16px;
+    }
+
+    .grid-desc {
+        font-size: 14px;
+    }
+
+    .grid-desc-small {
+        font-size: 13px;
+    }
+
+    .grid-tag {
+        font-size: 14px;
+        padding: 4px 12px;
+    }
+
+    .hero-name {
+        font-size: 32px;
+    }
+
+    .hero-school {
+        font-size: 18px;
+    }
+
+    .hero-avatar {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 20px;
+    }
+
+    .hero-avatar::after {
+        font-size: 28px;
+    }
+
+    .contact-text {
+        font-size: 20px;
+    }
+
+    .contact-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .contact-icon-email::before {
+        width: 10px;
+        height: 6px;
+    }
+
+    .contact-icon-phone::before {
+        width: 6px;
+        height: 10px;
+    }
+}
+
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="dot-nav" id="dotNav"></div>
+
+<div class="page-number" id="pageNumber">01 / 05</div>
+
+<div class="page-container" id="pageContainer">
+
+    <section class="page-section hero-section" data-index="0">
+        <div class="leaf-deco leaf-1"></div>
+        <div class="leaf-deco leaf-2"></div>
+        <div class="leaf-deco leaf-3"></div>
+        <div class="hero-content">
+            <h1 class="hero-name">葛欣雨</h1>
+            <p class="hero-school">瑞典皇家理工学院 · 交互媒体技术</p>
+            <div class="hero-line"></div>
+            <div class="hero-contact">
+                <div class="contact-item">
+                    <span class="contact-icon contact-icon-email"></span>
+                    <span class="contact-text">asahigxy818@gmail.com</span>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon contact-icon-phone"></span>
+                    <span class="contact-text">+86 18810203421</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-scroll-hint">
+            <span>向下滑动</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <section class="page-section" data-index="1">
+        <div class="leaf-deco leaf-1"></div>
+        <div class="leaf-deco leaf-2"></div>
+        <div class="project-wrapper">
+            <div class="project-box-alt1">
+                <div class="grid-cell-text">
+                    <div class="grid-text grid-text-full project1-text">
+                        <h2 class="grid-title">Sound Canyon：VR未来城市声景生成器</h2>
+                        <h3 class="grid-subtitle">项目简介</h3>
+                        <p class="grid-desc">随着自动化和AI重塑城市空间，未来城市的声音环境将发生深刻变化。本项目开发了一款基于VR的交互系统"Sound Canyon"，以"声音积木"为隐喻，让用户通过拾取、组合虚拟积木，主动构建自己理想中的未来城市声景，并在互动中反思个人对自然、技术、社会声音的价值观。</p>
+                        <h3 class="grid-subtitle">研究过程</h3>
+                        <p class="grid-desc-small">• 前期用户研究（N=10）：选取自然、社会、技术三类共20段声音，通过愉悦度排序、声音-形状匹配及访谈，筛选出15个核心声音，并建立声音与视觉符号的映射。结果显示：自然声音（鸟鸣、流水）最受欢迎；声音-形状匹配存在两种路径——语义联想（如儿童玩耍→桥形）和声学特征映射（如鸟鸣高频→锥形）。
+• VR原型设计：在Unity中构建"声音峡谷"场景，用户沿河流路径探索橙色（愉悦）、绿色（中性）、蓝色（不愉悦）的声音积木，通过手柄拾取、拖拽，并在终点组装属于自己的未来城市声景。采用低多边形风格和空间音频增强沉浸感。
+• 用户测试（N=8）：验证了积木隐喻的直观性与3D音频的沉浸效果。</p>
+                        <h3 class="grid-subtitle">主要成果</h3>
+                        <p class="grid-desc-small">• 建立了基于用户共识的声音-形状-颜色映射规则，为VR视听协同设计提供实证基础。
+• 实现了从"被动评估"到"主动构建"的转型：积木式操作降低了认知负荷，空间音频增强了在场感。
+• 验证了"日常聆听"理论：人们听的是声音所代表的事件（如"战争""童年"），而非物理参数；声景设计应基于叙事意义。</p>
+                    </div>
+                </div>
+                <div class="grid-cell-media">
+                    <div class="grid-media">
+                        <video id="video1" src="1.VR未来城市声景/VR 未来城市声景生成器设计.mp4" playsinline></video>
+                        <div class="video-overlay" onclick="toggleVideo('video1', this)">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                        <div class="video-controls" id="controls1">
+                            <button class="video-controls-btn" onclick="togglePlay('video1', 'controls1')">
+                                <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <svg class="pause-icon" style="display:none" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+                            <div class="video-progress" onclick="seekVideo(event, 'video1')">
+                                <div class="video-progress-bar" id="progress1"></div>
+                            </div>
+                            <span class="video-time" id="time1">0:00 / 0:00</span>
+                            <button class="video-fullscreen-btn" onclick="toggleFullscreen('video1')">
+                                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid-media">
+                        <img src="1.VR未来城市声景/1.png" alt="Sound Canyon" onclick="openImageModal(this.src)">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-section" data-index="2">
+        <div class="leaf-deco leaf-3"></div>
+        <div class="leaf-deco leaf-1"></div>
+        <div class="project-wrapper">
+            <div class="project-box-alt">
+                <div class="grid-cell grid-cell-full">
+                    <div class="grid-text grid-text-full">
+                        <h2 class="grid-title">个人知识库：AI驱动的知识管理范式探索</h2>
+                        <h3 class="grid-subtitle">项目简介</h3>
+                        <p class="grid-desc">用户常陷入"分类强迫症"，纠结笔记该放哪，最终仍靠关键词搜索，知识难以形成逻辑关联。针对这一"知识孤岛化"痛点，本项目开发了一款本地优先的知识库应用，利用AI技术从"存、管、用"三阶段重构流程，降低归档成本、增强关联感知、提升召回价值。</p>
+                        <h3 class="grid-subtitle">设计过程</h3>
+                        <p class="grid-desc-small">• 痛点发现：通过用户访谈与竞品分析，识别出三类核心问题——归档决策焦虑（不知道该存哪）、关联隐晦（笔记孤立无连接）、搜索价值有限（关键词匹配无法理解语义）。
+• 原型设计：设计三栏布局，并集成三大AI功能：智能归档（LLM向量匹配推荐路径）、语义图谱（Embedding聚类可视化）、内生式RAG搜索（私有库+大模型生成答案）。
+• 可用性测试：初期版本采用全局全量图谱，用户测试发现当知识点超过50个时，"知识图谱"变成视觉噪音，难以定位有效信息。
+• 迭代优化：参考"由粗到细"认知模型进行两次关键迭代：
+　　1. 语义缩放：全局视角仅展示大类聚合节点（Cluster Nodes），用户先感知知识分布比例，不被细节淹没。
+　　2. 层级下钻：点击感兴趣的大类后，图谱动态加载该领域细分节点，实现从宏观到微观的渐进式披露。迭代后，图谱从"装饰性背景"转变为"具有导航功能的交互索引"，用户反馈宏观到微观的推进感能更好地梳理知识逻辑。</p>
+                    </div>
+                </div>
+                <div class="grid-cell">
+                    <div class="grid-media">
+                        <img src="2. 个人知识库/1.png" alt="个人知识库" onclick="openImageModal(this.src)">
+                    </div>
+                    <div class="grid-text grid-text-center project2-text">
+                        <h3 class="grid-subtitle">主要成果</h3>
+                        <ul class="results-list">
+                            <li>智能归档将分类耗时从~15秒降至即时推荐</li>
+                            <li>语义图谱替代线性浏览，可视化激发跨项目灵感</li>
+                            <li>知识搜索从关键词匹配升级为理解意图的个性化回答</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-section" data-index="3">
+        <div class="leaf-deco leaf-2"></div>
+        <div class="leaf-deco leaf-3"></div>
+        <div class="project-wrapper">
+            <div class="project-box-alt3">
+                <div class="grid-cell grid-cell-text3">
+                    <div class="grid-text grid-text-full project1-text">
+                        <h2 class="grid-title">Co-Creating Wedding Memories：婚礼记忆共创App</h2>
+                        <h3 class="grid-subtitle">项目简介</h3>
+                        <p class="grid-desc">婚礼是一个充满情感与连接的仪式，但新人常面临两难：想要全心投入、不被手机干扰，又希望留住那些稍纵即逝的瞬间。本项目旨在设计一个共创平台，让宾客以自己的方式捕捉婚礼中的"小、有爱、混乱"的时刻，事后共同构建一条多视角的婚礼时间线，帮助新人真正"在场"，同时不丢失任何珍贵的记忆。</p>
+                        <h3 class="grid-subtitle">研究过程</h3>
+                        <p class="grid-desc-small">• 发现阶段：通过文献综述和半结构化访谈（7位近五年内结婚的参与者），发现宾客拍摄的照片具有专业摄影无法替代的情感价值，而新人普遍希望避免过度记录带来的干扰。
+• 定义阶段：基于亲和图分析，提炼出POV："结婚的新人需要以自发、参与式的方式捕捉婚礼瞬间，因为替代性的记录方法有助于保留情感细节与氛围"，并形成HMW问题："如何在最小干扰下捕捉人与人之间的小、有爱、混乱的瞬间？"
+• 构思与原型：采用"最差想法"方法引导创意，筛选出"时间线"为核心概念。经过并行设计、低保真原型评估（4位用户）及迭代，最终开发高保真移动应用原型，并再次评估（3位新人+4位宾客）。</p>
+                    </div>
+                </div>
+                <div class="bottom-row">
+                    <div class="images-row">
+                        <div class="grid-cell grid-cell-img1">
+                            <div class="grid-media">
+                                <img src="3. 婚礼记忆共创APP/1.png" alt="婚礼记忆共创App" onclick="openImageModal(this.src)">
+                            </div>
+                        </div>
+                        <div class="grid-cell grid-cell-img2">
+                            <div class="grid-media">
+                                <img src="3. 婚礼记忆共创APP/2.png" alt="婚礼记忆共创App" onclick="openImageModal(this.src)">
+                            </div>
+                        </div>
+                        <div class="grid-cell grid-cell-img3">
+                            <div class="grid-media">
+                                <img src="3. 婚礼记忆共创APP/3.png" alt="婚礼记忆共创App" onclick="openImageModal(this.src)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid-cell grid-cell-results">
+                        <div class="grid-text project1-text">
+                            <h3 class="grid-subtitle">主要成果</h3>
+                            <p class="grid-desc-small">• 设计了一款名为"Wedding Moments"的移动应用：宾客可在婚后上传照片、视频、语音，加入预设或新建的"时刻"；新人可自定义主题色、欢迎语，并预置希望被捕捉的关键时刻。
+• 时间线以"时刻"为单位呈现，支持多视角内容汇聚，将零散的拍摄转化为多层次的集体叙事。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="page-section" data-index="4">
+        <div class="leaf-deco leaf-1"></div>
+        <div class="leaf-deco leaf-2"></div>
+        <div class="project-wrapper">
+            <div class="project-box-alt4">
+                <div class="grid-cell grid-cell-video">
+                    <div class="grid-media">
+                        <video controls>
+                            <source src="4. 加入虚拟代理对话/linkedin_video.mp4" type="video/mp4">
+                            您的浏览器不支持视频播放。
+                        </video>
+                    </div>
+                    <div class="grid-media">
+                        <img src="4. 加入虚拟代理对话/1.png" alt="VR社交体验用户研究" onclick="openImageModal(this.src)">
+                    </div>
+                </div>
+                <div class="grid-cell grid-cell-text">
+                    <div class="grid-text grid-text-full project1-text">
+                        <h2 class="grid-title">加入虚拟代理对话：VR社交体验用户研究</h2>
+                        <h3 class="grid-subtitle">项目简介</h3>
+                        <p class="grid-desc">随着虚拟代理在VR中的普及，理解人如何加入小型对话群体变得至关重要。本研究聚焦于虚拟代理的礼貌策略（言语与非言语）以及用户的空间起始位置对群体加入行为的影响。参与者进入一个基于社会困境的VR场景，需要在"物理效率"与"社交空间规范"之间做出权衡，探讨不同策略和位置如何影响服从性、规范遵守程度及用户主观感知。</p>
+                        <h3 class="grid-subtitle">研究过程</h3>
+                        <p class="grid-desc-small">• 实验设计：采用4（礼貌策略：无、间接、积极、直接）×3（起始位置：中心、中间、侧向）的组内设计，21名参与者完成12个试次。场景中两个虚拟代理形成F-构型，参与者需响应邀请并选择加入路径：便捷路线（近侧）、违规路线（穿过o-space）、不便但符合规范的绕行路线。
+• 数据采集：记录路径选择（说服力）、是否穿过o-space（规范遵守）、行走时长、每次试次后的Likert量表（清晰度、冒犯感、友好度、自由感），并监测心率。
+• 关键变量：直接策略（"Come here！"+指指点点）、积极策略（"Would you like to come here？"+手掌侧摆）、间接策略（"Welcome back！"+手掌上翻）、无策略（无言语无手势）。</p>
+                        <h3 class="grid-subtitle">主要成果</h3>
+                        <p class="grid-desc-small">• 直接策略说服力显著最强，积极策略次之，无策略最弱。
+• 社交规范几近崩溃：仅6.9%的试次选择绕行，中心起始位置下100%穿过o-space，远低于先前研究的75%。
+• 直接策略最清晰但最冒犯，积极策略最友好且自由感最高；起始位置对主观评价无显著影响。</p>
+                        <h3 class="grid-subtitle">项目价值</h3>
+                        <p class="grid-desc-small">本研究揭示了VR中社交规范的脆弱性：礼貌策略不足以引导行为，清晰度才是服从的关键，积极策略可作为平衡友好与有效的折中方案。这些发现为虚拟角色动画库开发提供数据支撑（动画库见视频）。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+(function () {
+    var sections = document.querySelectorAll('.page-section');
+    var container = document.getElementById('pageContainer');
+    var dotNav = document.getElementById('dotNav');
+    var pageNumber = document.getElementById('pageNumber');
+    var total = sections.length;
+    var current = 0;
+    var isAnimating = false;
+    var touchStartY = 0;
+    var touchEndY = 0;
+
+    for (var i = 0; i < total; i++) {
+        var dot = document.createElement('button');
+        dot.className = 'dot-nav-item' + (i === 0 ? ' active' : '');
+        dot.setAttribute('data-index', i);
+        dot.setAttribute('aria-label', '跳转到第' + (i + 1) + '页');
+        dot.addEventListener('click', function () {
+            goTo(parseInt(this.getAttribute('data-index')));
+        });
+        dotNav.appendChild(dot);
+    }
+
+    function goTo(index) {
+        if (isAnimating || index === current || index < 0 || index >= total) return;
+        stopAllVideos();
+        isAnimating = true;
+        current = index;
+        container.style.transform = 'translateY(-' + (current * 100) + 'vh)';
+        updateNav();
+        setTimeout(function () {
+            isAnimating = false;
+        }, 850);
+    }
+
+    function stopAllVideos() {
+        var videos = document.querySelectorAll('video');
+        for (var i = 0; i < videos.length; i++) {
+            videos[i].pause();
+            videos[i].currentTime = 0;
+        }
+    }
+
+    function updateNav() {
+        var dots = dotNav.querySelectorAll('.dot-nav-item');
+        for (var i = 0; i < dots.length; i++) {
+            dots[i].classList.toggle('active', i === current);
+        }
+        var num = (current + 1);
+        pageNumber.textContent = (num < 10 ? '0' + num : num) + ' / ' + (total < 10 ? '0' + total : total);
+        pageNumber.style.opacity = current === 0 ? '0' : '1';
+        sections[current].classList.add('visible');
+    }
+
+    function handleScroll(e) {
+        e.preventDefault();
+        if (isAnimating) return;
+        if (e.deltaY > 30) {
+            goTo(current + 1);
+        } else if (e.deltaY < -30) {
+            goTo(current - 1);
+        }
+    }
+
+    window.addEventListener('wheel', handleScroll, { passive: false });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+            e.preventDefault();
+            goTo(current + 1);
+        } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+            e.preventDefault();
+            goTo(current - 1);
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            goTo(0);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            goTo(total - 1);
+        }
+    });
+
+    document.addEventListener('touchstart', function (e) {
+        touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', function (e) {
+        touchEndY = e.changedTouches[0].screenY;
+        var diff = touchStartY - touchEndY;
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+                goTo(current + 1);
+            } else {
+                goTo(current - 1);
+            }
+        }
+    }, { passive: true });
+
+    sections[0].classList.add('visible');
+    updateNav();
+})();
+
+function toggleVideo(videoId, overlay) {
+    var video = document.getElementById(videoId);
+    if (!video) return;
+    if (video.paused) {
+        video.play();
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+    } else {
+        video.pause();
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
+    }
+    video.addEventListener('ended', function () {
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
+    }, { once: true });
+}
+
+function formatTime(seconds) {
+    var mins = Math.floor(seconds / 60);
+    var secs = Math.floor(seconds % 60);
+    return mins + ':' + (secs < 10 ? '0' : '') + secs;
+}
+
+function togglePlay(videoId, controlsId) {
+    var video = document.getElementById(videoId);
+    var controls = document.getElementById(controlsId);
+    if (!video) return;
+    var playIcon = controls.querySelector('.play-icon');
+    var pauseIcon = controls.querySelector('.pause-icon');
+    if (video.paused) {
+        video.play();
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+    } else {
+        video.pause();
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+    }
+    video.addEventListener('timeupdate', function() {
+        updateProgress(videoId);
+    });
+}
+
+function updateProgress(videoId) {
+    var video = document.getElementById(videoId);
+    var progress = document.getElementById('progress' + videoId.replace('video', ''));
+    var timeDisplay = document.getElementById('time' + videoId.replace('video', ''));
+    if (!video || !progress || !timeDisplay) return;
+    var percent = (video.currentTime / video.duration) * 100;
+    progress.style.width = percent + '%';
+    timeDisplay.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration || 0);
+}
+
+function seekVideo(event, videoId) {
+    var video = document.getElementById(videoId);
+    var progress = event.currentTarget;
+    if (!video || !video.duration) return;
+    var rect = progress.getBoundingClientRect();
+    var percent = (event.clientX - rect.left) / rect.width;
+    video.currentTime = percent * video.duration;
+}
+
+function toggleFullscreen(videoId) {
+    var video = document.getElementById(videoId);
+    if (!video) return;
+    var container = video.closest('.grid-media');
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    } else if (container.requestFullscreen) {
+        container.requestFullscreen();
+    } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+    }
+}
+
+function openImageModal(src) {
+    var modal = document.getElementById('imageModal');
+    var modalImg = modal.querySelector('img');
+    modalImg.src = src;
+    modal.classList.add('active');
+}
+
+function closeImageModal() {
+    var modal = document.getElementById('imageModal');
+    modal.classList.remove('active');
+}
+</script>
+
+<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+    <button class="close-btn" onclick="event.stopPropagation(); closeImageModal();">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+    <img src="" alt="预览图片">
+</div>
+
+</body>
+</html>
